@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingest
+  namespace: argo-mgmt
+data:
+  ACCESSMANAGER_URL: http://accessmanager$(postfix).backend.svc.cluster.local:8090
+  UPLOAD_ENDPOINT: http://accessmanager$(postfix).backend.svc.cluster.local:8090/accessmanager/api/v2.0/accessmanager/upload/main
+  DELETE_ENDPOINT: http://accessmanager$(postfix).backend.svc.cluster.local:8090/accessmanager/api/v2.0/accessmanager/delete
+  READ_ENDPOINT: http://accessmanager$(postfix).backend.svc.cluster.local:8090/accessmanager/api/v2.0/accessmanager/read
+  ORGAMANAGER_URL: http://organizationmanager$(postfix).backend.svc.cluster.local:8090
+  INDEXER_URL: http://metadata-service$(postfix).backend.svc.cluster.local:8090
+  SKIP_VALIDATE_ORGANIZATIONS: $(skip_validate_organizations)

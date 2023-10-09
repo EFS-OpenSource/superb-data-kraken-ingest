@@ -1,0 +1,11 @@
+site_name: Ingest
+repo_url: https://dev.azure.com/EFSCIS/EFS-SDK/_git/ingest
+site_description: Documentation for the Ingest Repo of the Superb Data Kraken
+
+nav:
+- Home: index.md
+- Architecture Decision Records (ADR):
+  - Template: arch/0000_template-adr.md
+
+plugins:
+- techdocs-core

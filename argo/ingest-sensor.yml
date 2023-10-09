@@ -1,0 +1,176 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: ingest
+  namespace: argo-mgmt
+spec:
+  template:
+    serviceAccountName: argo-events-controller-manager
+  dependencies:
+  - name: accessmanager-commit
+    eventSourceName: accessmanager-commit
+    eventName: accessmanager
+  triggers:
+  - template:
+      name: workflow-trigger
+      argoWorkflow:
+        group: argoproj.io
+        version: v1alpha1
+        resource: workflows
+        operation: submit
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: ingest-
+              labels:
+                scope: ingest
+            spec:
+              entrypoint: process
+              arguments:
+                parameters:
+                - name: message
+                  # value will get overridden by the event payload
+                  value: hello world
+              templates:
+              #                    ingest
+              #                       |
+              #              skipvalidation
+              #             /                    \
+              #       skip-validate         basicmetadata
+              #             \                    |
+              #               \              anonymize
+              #                 \                |
+              #                   \          enrichment
+              #                     \            |
+              #                       \      validate
+              #                         \      /
+              #                        movedata
+              #                            |
+              #                       metadataindex
+
+              - name: process
+                dag:
+                  tasks:
+                  # skipvalidation
+                  - name: skipvalidation
+                    template: skipvalidation
+                  - name: skip-validate
+                    # evaluate the result in parallel
+                    template: skip-validate # call skip-validate template if skipvalidation
+                    depends: skipvalidation
+                    when: "{{tasks.skipvalidation.outputs.result}} == True"
+                  - name: basicmetadata
+                    template: basicmetadata
+                    depends: skipvalidation
+                    when: "{{tasks.skipvalidation.outputs.result}} == False"
+                  - name: anonymize
+                    template: anonymize # call anonymize template if not skipvalidation
+                    depends: basicmetadata
+                    when: "{{tasks.skipvalidation.outputs.result}} == False"
+                  - name: enrichment
+                    template: enrichment
+                    depends: anonymize
+                    when: "{{tasks.skipvalidation.outputs.result}} == False"
+                  - name: validate
+                    template: validate
+                    depends: enrichment
+                    when: "{{tasks.skipvalidation.outputs.result}} == False"
+                  - name: movedata
+                    template: movedata
+                    depends: "validate || skip-validate"
+                  - name: metadataindex
+                    template: metadataindex
+                    depends: movedata
+              - name: basicmetadata
+                container:
+                  image: acr$(environment).azurecr.io/basicmetadata:$(tagVersion)
+                  imagePullPolicy: Always
+                  command: ["python"]
+                  args: ["main.py", "-p", "{{workflow.parameters.message}}"]
+                  envFrom:
+                  - configMapRef:
+                      name: ingest
+                  - secretRef:
+                      name: auth-secret
+              - name: anonymize
+                container:
+                  image: alpine:3.6
+                  command: [sh, -c]
+                  args: ["echo \"TODO: anonymize metadata\""]
+              - name: enrichment
+                container:
+                  image: alpine:3.6
+                  imagePullPolicy: Always
+                  command: [sh, -c]
+                  args: ["echo \"TODO: enrich metadata\""]
+              - name: skipvalidation
+                # Return if organization supports validation
+                container:
+                  image: acr$(environment).azurecr.io/skipvalidation:$(tagVersion)
+                  imagePullPolicy: Always
+                  command: ["python"]
+                  args: ["main.py", "-p", "{{workflow.parameters.message}}"]
+                  envFrom:
+                  - configMapRef:
+                      name: ingest
+              - name: skip-validate
+                # Currently does nothing
+                container:
+                  image: alpine:3.6
+                  command: [sh, -c]
+                  args: ["echo \"no validation required\""]
+              - name: validate
+                # Currently does nothing
+                container:
+                  image: alpine:3.6
+                  command: [sh, -c]
+                  args: ["echo \"TODO: validate\""]
+              - name: movedata
+                container:
+                  image: acr$(environment).azurecr.io/movedata:$(tagVersion)
+                  imagePullPolicy: Always
+                  command: ["python"]
+                  args: ["main.py", "-p", "{{workflow.parameters.message}}"]
+                  envFrom:
+                  - configMapRef:
+                      name: ingest
+                  - secretRef:
+                      name: auth-secret
+              - name: metadataindex
+                container:
+                  image: acr$(environment).azurecr.io/metadataindex:$(tagVersion)
+                  imagePullPolicy: Always
+                  command: ["python"]
+                  args: ["main.py", "-p", "{{workflow.parameters.message}}"]
+                  envFrom:
+                  - configMapRef:
+                      name: ingest
+                  - secretRef:
+                      name: auth-secret
+              ttlStrategy:
+                secondsAfterCompletion: 86400
+              podGC:
+                strategy: OnWorkflowSuccess
+        parameters:
+        - src:
+            dependencyName: accessmanager-commit
+          dest: spec.arguments.parameters.0.value
+    retryStrategy:
+      # Give up after this many times
+      steps: 3
+      # The initial duration, use strings like "2s", "1m"
+      duration: 2s
+      # Duration is multiplied by factor each retry, if factor is not zero
+      # and steps limit has not been reached.
+      # Should not be negative
+      #
+      # Defaults to "1.0"
+      factor: 2.0
+      # The sleep between each retry is the duration plus an additional
+      # amount chosen uniformly at random from the interval between
+      # zero and `jitter * duration`.
+      #
+      # Defaults to "1"
+      jitter: 2

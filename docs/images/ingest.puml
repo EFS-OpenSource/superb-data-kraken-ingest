@@ -1,0 +1,20 @@
+@startuml
+
+start
+:ingest;
+
+if (skip_validation?)  then (yes)
+  :skip_validate;
+else (no)
+  :basic_metadata;
+  :anonymize;
+  :enrichment;
+  :validate;
+endif
+
+:move_data;
+:metadata_index;
+
+stop
+
+@enduml

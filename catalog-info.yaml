@@ -1,0 +1,31 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sdk-datastore-ingest-workflow
+  description: Ingest Workflow of the Superb Data Kraken
+  annotations:
+    dev.azure.com/project-repo: EFS-SDK/ingest
+    backstage.io/techdocs-ref: dir:.
+  tags:
+  - argo
+  - workflows
+  - sdk
+  - sdk-datastore
+spec:
+  type: workflow
+  lifecycle: production
+  owner: team-sdk
+  system: sdk
+  subcomponentOf: sdk-datastore
+  dependsOn:
+  - component:sdk-datastore-accessmanager-service
+  - component:sdk-metadata-metadata-service
+  - component:sdk-operations-keycloak-service
+  - component:sdk-operations-kafka-service
+  - component:sdk-operations-argo-service
+  providesApis:
+  - sdk-analyze-workflowmanager-api
+  consumesApis:
+  - sdk-datastore-accessmanager-api
+  - sdk-metadata-metadata-api
+  - sdk-operations-keycloak-api
