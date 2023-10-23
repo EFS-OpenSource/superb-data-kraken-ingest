@@ -132,7 +132,7 @@ def index(storage_access: StorageAccess, access_token: str, payload: dict) -> st
     # Extract organization, space and root_dir from the payload
     organization = payload['accountName']
     space = payload['storageName']
-    root_dir = payload['rootDir']
+    root_dir = payload['rootDir'].rstrip('/')
 
     dataset = storage_access.get_dataset(organization, space, root_dir, access_token)
     with open(dataset.meta_json, 'r') as f:
@@ -255,7 +255,7 @@ if __name__ == '__main__':
     })
     user_id = decoded['sub']
     space = payload['storageName']
-    root_dir = payload['rootDir']
+    root_dir = payload['rootDir'].rstrip('/')
 
     state = IngestStatus(organization=organization, space=space, rootdir=root_dir, userid=user_id, docid=docid)
     storage_access.store_status(auth_header_user_context, organization, space, root_dir, state)
