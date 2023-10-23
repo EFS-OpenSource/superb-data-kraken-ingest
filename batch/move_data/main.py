@@ -141,7 +141,7 @@ def move_data(storage_access: StorageAccess, payload: dict, access_token: str):
 
     organization = payload['accountName']
 
-    root_dir_name = payload['rootDir']
+    root_dir_name = payload['rootDir'].rstrip('/')
 
     storage_access.move_data(access_token, organization, src_space, dst_space, root_dir_name)
 
@@ -183,13 +183,13 @@ if __name__ == '__main__':
     logger.setLevel(level=logging.INFO)
 
     parser = argparse.ArgumentParser(description='Script to move files', )
-
+    
     parser.add_argument('--payload', '-p', dest='payload', type=str, required=True)
-
+    
     args = parser.parse_args()
     if not args.payload:
         raise Exception('no payload provided')
-
+    
     origin = get_payload(args.payload)
     payload = extract_notification(origin)
     logger.info(payload)

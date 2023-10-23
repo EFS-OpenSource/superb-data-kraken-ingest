@@ -18,6 +18,7 @@
 import logging
 import os
 import time
+import urllib.parse
 
 import requests
 from azure.storage.blob import BlobClient, ContainerClient
@@ -43,10 +44,11 @@ class AzureStorageAccess(StorageAccess):
             f'{_get_storage_url(organization, src_space)}?{read_sas}')
         my_blobs = source_container_client.list_blobs(name_starts_with=root_dir + "/")
         for my_blob in my_blobs:
+            file_name = urllib.parse.quote(my_blob.name)
             src_blob_client = BlobClient.from_blob_url(
-                f'{_get_storage_url(organization, src_space)}/{my_blob.name}?{delete_sas}')
+                f'{_get_storage_url(organization, src_space)}/{file_name}?{delete_sas}')
             dst_blob_client = BlobClient.from_blob_url(
-                f'{_get_storage_url(organization, dst_space)}/{my_blob.name}?{upload_sas}')
+                f'{_get_storage_url(organization, dst_space)}/{file_name}?{upload_sas}')
 
             # Copy started"
             logger.info(f'moving file from {my_blob.name} to {my_blob.name}')

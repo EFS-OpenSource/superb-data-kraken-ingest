@@ -79,5 +79,5 @@ class IngestStatus:
     def load_from_json(cls, local_path: str):
         with open(local_path, 'r') as f:
             data = json.load(f)
-        return cls(organization=data['organization'], space=data['space'], rootdir=data['rootdir'],
+        return cls(organization=data['organization'], space=data['space'], rootdir=data['rootdir'].rstrip('/'),
                             userid=data['userid'], docid=data['docid'])

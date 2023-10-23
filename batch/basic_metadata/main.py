@@ -108,7 +108,7 @@ if __name__ == '__main__':
     organization = payload['accountName']
     space = payload['storageName']
     container = payload['containerName']
-    root_dir = payload['rootDir']
+    root_dir = payload['rootDir'].rstrip('/')
     username = payload['userName']
 
     # Request an access_token
