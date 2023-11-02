@@ -184,6 +184,7 @@ def file_filter(wildcard: str, blobnames: list[str]) -> list[str]:
     :param blobnames: the blob-names
     :return: the filtered blobnames
     """
+    logger.info(wildcard)
     pattern = wildcard2regex(wildcard)
     # TODO: remove
     logger.info(pattern)
