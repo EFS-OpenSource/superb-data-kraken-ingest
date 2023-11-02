@@ -100,17 +100,28 @@ Finally, the data is being moved from `loadingzone` to the main-storage.
 
 The following pipeline variables are required:
 
-| name             | description                                                                                     |
-| ---------------- | ----------------------------------------------------------------------------------------------- |
-| CLIENT_ID        | client-id of confidential OAuth-Client                                                          |
-| CLIENT_SECRET    | client-secret of confidential OAuth-Client                                                      |
-| ACCESS_TOKEN_URI | URI of the token-endpoint                                                                       |
-| STORAGE_TYPE     | storage-type - one of `azure` and `s3` (default: `azure` - s3 currently not supported)          |
-| READ_ENDPOINT    | endpoint for generating SAS-Token in read-scope (only required, if `azure`-storage)             |
-| UPLOAD_ENDPOINT  | endpoint for generating SAS-Token in upload-scope (only required, if `azure`-storage)           |
-| DELETE_ENDPOINT  | endpoint for generating SAS-Token in delete-scope (only required, if `azure`-storage)           |
-| STORAGE_DOMAIN   | domain of the storage-implementation (only required, if `s3`-storage - currently not supported) |
-| BUCKET           | storage-bucket (only required, if `s3`-storage - currently not supported)                       |
+| name             | description                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| CLIENT_ID        | client-id of confidential OAuth-Client                                                                      |
+| CLIENT_SECRET    | client-secret of confidential OAuth-Client                                                                  |
+| ACCESS_TOKEN_URI | URI of the token-endpoint                                                                                   |
+| STORAGE_TYPE     | storage-type - one of `azure` and `s3` (default: `azure` - s3 currently not supported)                      |
+| READ_ENDPOINT    | endpoint for generating SAS-Token in read-scope (only required, if `azure`-storage)                         |
+| UPLOAD_ENDPOINT  | endpoint for generating SAS-Token in upload-scope (only required, if `azure`-storage)                       |
+| DELETE_ENDPOINT  | endpoint for generating SAS-Token in delete-scope (only required, if `azure`-storage)                       |
+| BLACKLIST        | comma-separated list of wildcarded blob names that should not be moved to main-storage but deleted directly |
+| &lt;ORGA&gt;.WHITELIST | comma-separated list of wildcarded blob names that should be moved to main-storage                          |
+| STORAGE_DOMAIN   | domain of the storage-implementation (only required, if `s3`-storage - currently not supported)             |
+| BUCKET           | storage-bucket (only required, if `s3`-storage - currently not supported)                                   |
+
+**NOTE on black- and whitelist:** The blacklist applies globally. It can be used to define files that can potentially cause damage to the system (*.exe, *.bat). If your organization only has certain file-extensions, you can use the organization-scoped whitelist to prevent uploading other extensions. The blacklist restricts each whitelist.
+
+If you have the following configuration a bat- or a png-file would not be moved to main-storage:
+
+```
+blacklist = "*.exe,*.bat"
+whitelist = "*.csv,*.json,*.bat"
+```
 
 ## Getting Started
 

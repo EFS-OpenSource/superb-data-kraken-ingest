@@ -40,7 +40,8 @@ class S3StorageAccess(StorageAccess):
         self.storage_domain = os.getenv(ENV_STORAGE_DOMAIN)
         self.bucket = os.getenv(ENV_BUCKET)
 
-    def move_data(self, access_token: str, organization: str, src_space: str, dst_space: str, root_dir: str):
+    def move_data(self, access_token: str, organization: str, src_space: str, dst_space: str, root_dir: str,
+                  blacklist: str, whitelist: str):
         logging.warning('move_data is not implemented yet!')
         pass
 

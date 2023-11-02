@@ -11,3 +11,4 @@ data:
   ORGAMANAGER_URL: http://organizationmanager$(postfix).backend.svc.cluster.local:8090
   INDEXER_URL: http://metadata-service$(postfix).backend.svc.cluster.local:8090
   SKIP_VALIDATE_ORGANIZATIONS: $(skip_validate_organizations)
+  BLACKLIST: "*.exe,*.sh,*.bat,*.ps1,*.js"
