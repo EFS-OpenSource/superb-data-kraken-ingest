@@ -167,7 +167,7 @@ def get_env(env_var_name: str, obligatory: bool = True):
         for match in list(re.finditer(regex, env_var_value, re.MULTILINE)):
             return match.group(1)
 
-    return env_var_value
+    return env_var_value.strip()
 
 
 def _get_storage_access() -> StorageAccess:
