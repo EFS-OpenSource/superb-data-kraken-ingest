@@ -214,7 +214,7 @@ if __name__ == '__main__':
     storage_access = _get_storage_access()
 
     # TODO: cleanup
-    blacklist = get_env('BLACKLIST')
+    blacklist = get_env('BLACKLIST', False)
     organization = payload['accountName']
     whitelist = get_env(f'{organization}.WHITELIST'.upper(), False)
     move_data(storage_access, payload, auth_header_user_context, blacklist=blacklist, whitelist=whitelist)
