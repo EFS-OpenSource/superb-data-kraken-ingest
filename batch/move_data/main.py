@@ -125,7 +125,7 @@ def get_payload(payload: str):
     return payload
 
 
-def move_data(storage_access: StorageAccess, payload: dict, access_token: str):
+def move_data(storage_access: StorageAccess, payload: dict, access_token: str, blacklist: str, whitelist: str):
     """
     moves data as provided by payload, assume that the payload consists of containerName (source-container), storageName (dest-container), accountName (storage-account) and directory name (the directory of the files to move)
     :param storage_access: the storage-access-instance
@@ -143,17 +143,22 @@ def move_data(storage_access: StorageAccess, payload: dict, access_token: str):
 
     root_dir_name = payload['rootDir'].rstrip('/')
 
-    storage_access.move_data(access_token, organization, src_space, dst_space, root_dir_name)
+    storage_access.move_data(access_token, organization, src_space, dst_space, root_dir_name, blacklist=blacklist,
+                             whitelist=whitelist)
 
 
-def get_env(env_var_name: str):
+def get_env(env_var_name: str, obligatory: bool = True):
     """
     returns value of environment-variable
     :param env_var_name: the name of the environment-variable
+    :param obligatory: if the definition of the environment-variable is obligatory (default: True)
     :return: value of environment-variable
     """
     if env_var_name not in os.environ:
-        raise Exception(f'no environment-variable found - provide "{env_var_name}"')
+        if obligatory:
+            raise Exception(f'no environment-variable found - provide "{env_var_name}"')
+        else:
+            return None
 
     env_var_value = os.environ[env_var_name]
     # check if environment-variable-value is stored in quotas
@@ -162,7 +167,7 @@ def get_env(env_var_name: str):
         for match in list(re.finditer(regex, env_var_value, re.MULTILINE)):
             return match.group(1)
 
-    return env_var_value
+    return env_var_value.strip()
 
 
 def _get_storage_access() -> StorageAccess:
@@ -207,4 +212,9 @@ if __name__ == '__main__':
                                                          auth_header_service_connection)
 
     storage_access = _get_storage_access()
-    move_data(storage_access, payload, auth_header_user_context)
+
+    # TODO: cleanup
+    blacklist = get_env('BLACKLIST', False)
+    organization = payload['accountName']
+    whitelist = get_env(f'{organization}.WHITELIST'.upper(), False)
+    move_data(storage_access, payload, auth_header_user_context, blacklist=blacklist, whitelist=whitelist)
