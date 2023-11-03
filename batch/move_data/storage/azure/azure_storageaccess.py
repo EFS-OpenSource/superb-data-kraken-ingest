@@ -46,7 +46,6 @@ class AzureStorageAccess(StorageAccess):
         source_container_client = ContainerClient.from_container_url(
             f'{_get_storage_url(organization, src_space)}?{read_sas}')
         my_blobs = source_container_client.list_blobs(name_starts_with=root_dir + "/")
-        # workaround, as BlobProperties is not hashable -> extract file-names
         blob_names = [blob.name for blob in my_blobs]
         filtered = filter_blobs(blob_names, blacklist, whitelist)
 
