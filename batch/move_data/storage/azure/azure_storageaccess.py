@@ -184,4 +184,4 @@ def file_filter(wildcard: str, blobnames: list[str]) -> list[str]:
     :return: the filtered blobnames
     """
     pattern = wildcard2regex(wildcard)
-    return [blob for blob in blobnames if re.search(pattern, blob)]
+    return [blob for blob in blobnames if re.search(pattern, blob, re.IGNORECASE)]
