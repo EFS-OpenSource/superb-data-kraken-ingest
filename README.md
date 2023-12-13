@@ -135,7 +135,7 @@ Follow the instructions below to set up a local copy of the project for developm
 - A running [argo workflows instance](https://argoproj.github.io/argo-workflows/)
 - A running [argo events instance](https://argoproj.github.io/argo-events/) with an [EventSource](https://argoproj.github.io/argo-events/concepts/event_source/)
   listening on the kafka-event `accessmanager-commit` (which is sent by accessmanager/commit)
-- Cloud-Storage in expected [storage-structure](https://github.com/EFS-OpenSource/superb-data-kraken-architecture) - currently only azure supported
+- Cloud-Storage in expected [storage-structure](https://efs-opensource.github.io/superbdatakraken/architecture/#storagemanager) - currently only azure supported
 - [accessmanager](https://github.com/EFS-OpenSource/superb-data-kraken-accessmanager)
 - [organizationmanager](https://github.com/EFS-OpenSource/superb-data-kraken-organizationmanager)
 - [metadata-service](https://github.com/EFS-OpenSource/superb-data-kraken-metadata)
