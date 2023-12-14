@@ -6,6 +6,14 @@ metadata:
 spec:
   template:
     serviceAccountName: argo-events-controller-manager
+    container:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 50m
+          memory: 50Mi
   dependencies:
   - name: accessmanager-commit
     eventSourceName: accessmanager-commit
@@ -85,7 +93,7 @@ spec:
                     depends: movedata
               - name: basicmetadata
                 container:
-                  image: acr$(environment).azurecr.io/basicmetadata:$(tagVersion)
+                  image: $(CONTAINER_REGISTRY)/basicmetadata:$(tagVersion)
                   imagePullPolicy: Always
                   command: ["python"]
                   args: ["main.py", "-p", "{{workflow.parameters.message}}"]
@@ -108,7 +116,7 @@ spec:
               - name: skipvalidation
                 # Return if organization supports validation
                 container:
-                  image: acr$(environment).azurecr.io/skipvalidation:$(tagVersion)
+                  image: $(CONTAINER_REGISTRY)/skipvalidation:$(tagVersion)
                   imagePullPolicy: Always
                   command: ["python"]
                   args: ["main.py", "-p", "{{workflow.parameters.message}}"]
@@ -129,7 +137,7 @@ spec:
                   args: ["echo \"TODO: validate\""]
               - name: movedata
                 container:
-                  image: acr$(environment).azurecr.io/movedata:$(tagVersion)
+                  image: $(CONTAINER_REGISTRY)/movedata:$(tagVersion)
                   imagePullPolicy: Always
                   command: ["python"]
                   args: ["main.py", "-p", "{{workflow.parameters.message}}"]
@@ -140,7 +148,7 @@ spec:
                       name: auth-secret
               - name: metadataindex
                 container:
-                  image: acr$(environment).azurecr.io/metadataindex:$(tagVersion)
+                  image: $(CONTAINER_REGISTRY)/metadataindex:$(tagVersion)
                   imagePullPolicy: Always
                   command: ["python"]
                   args: ["main.py", "-p", "{{workflow.parameters.message}}"]

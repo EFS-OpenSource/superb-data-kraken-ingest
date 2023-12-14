@@ -113,5 +113,6 @@ stages:
               kubernetesServiceConnection: '$(kubernetesServiceConnection)'
               namespace: 'argo-mgmt'
               manifests: |
+                $(Pipeline.Workspace)/kubernetes/auth-secret.yml
                 $(Pipeline.Workspace)/kubernetes/config-map.yml
                 $(Pipeline.Workspace)/kubernetes/ingest-sensor.yml
